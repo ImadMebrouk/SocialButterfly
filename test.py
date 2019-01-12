@@ -1,4 +1,5 @@
-
+#from TestRedis import*
+#from redis_wrap import get_redis, get_hash, get_set, setup_system
 import redis
 
 r = redis.Redis(
@@ -8,7 +9,7 @@ r = redis.Redis(
 
 
 
-def create_user( **kwargs):   #WORKING
+def create_user( **kwargs):  #WORKING
 
     id_count= r.exists("id_count")
 
@@ -28,7 +29,7 @@ def create_user( **kwargs):   #WORKING
     r.incr("compteur")
     return r.hget(user, "user_id")
 
-def user_connection(username, pwd): #working
+def user_connection(username, pwd): #WORKING
     connection_success = False
     if(get_user_by_username(username)):
         current_password = str(r.hget("user:"+str(get_user_by_username(username)), "password"))
@@ -39,7 +40,7 @@ def user_connection(username, pwd): #working
 
     return connection_success
 
-def get_user_by_username(username): #working
+def get_user_by_username(username): #WORKING
     user_id =1
     user = "user:" + str(user_id)
     while r.hget(user,"username") != None:
@@ -50,7 +51,7 @@ def get_user_by_username(username): #working
             user_id+=1
     return false # no user found with this username 
 
-def get_user_by_id(user_id): #working
+def get_user_by_id(user_id): #WORKING
 
     username = r.hget("user:" + str(user_id), "username")
 
@@ -61,14 +62,18 @@ def get_user_by_id(user_id): #working
         return False
 
 
-def add_Friend(user_id, friend_id): #toDO
+def add_Friend(user_id, friend_id): #WORKING
+   
+
+    r.sadd('user:'+str(user_id)+".friends", friend_id)
+    r.sadd('user:'+str(friend_id)+".friends",user_id)
+ 
+
+def  delete_friend(user_id, friend_id): #WORKING    
+ 
+    r.srem('user:'+str(user_id)+".friends", friend_id)
+    r.srem('user:'+str(friend_id)+".friends",user_id)
     
-    r.lpush('user.'+user_id+'.friendsList', friend_id)
-    r.lpush('user.'+friend_id+'.friendsList', user_id)
-
-def  delete_friend(user_id, friend_id): #toDo 
-    return null
-
 Imad = {
     "username": "coach",
     "password": "password",
@@ -81,6 +86,31 @@ Imad = {
     "posts": ""
     }
 
+Clement = {
+    "username": "starkiller",
+    "password": "password",
+    "first_name": "clement",
+    "last_name": "jacques",
+    "age":"22",
+    "gender":"male",
+    "location": "Sannois",
+    "friendsList": "",
+    "posts": ""
+    }
+
+Test = {
+    "username": "test3",
+    "password": "root",
+    "first_name": "test",
+    "last_name": "trois",
+    "age":"22",
+    "gender":"male",
+    "location": "Paris",
+    "friendsList": "",
+    "posts": ""
+    }
+
+
 
 create_user(**Imad)
 
@@ -88,3 +118,14 @@ print(get_user_by_id(1))
 
 print(user_connection("b'coach'", "b'password'")) # don't understand why "b" is added when i do hget(something)
 
+print("adding frienID 2")
+add_Friend(1,2)
+print(r.smembers("user:1.friends"))
+print("adding frienID 3")
+add_Friend(1,3)
+print(r.smembers("user:1.friends"))
+print("deleting frienID 2")
+delete_friend(1,2)
+print(r.smembers("user:1.friends"))
+
+r.flushdb() #cleaning the database for tests 
