@@ -5,16 +5,25 @@ r = redis.Redis(
     host = 'localhost',
     port=6379)
 
+def create_user( **kwargs):
 
-def create_user(id_attr, **kwargs):
-    user_id =("user." + kwargs['id'])
-    user = {}
+    id_count= r.exists("id_count")
 
-    for key, value in kwargs.items():
-        user[key] = value
-   
-    r.hmset(user_id,user)
- 
+    if(id_count)==1:
+        count = int(r.get("id_count"))
+    else:
+        count = 0
+        r.set("id_count", count)
+
+    user = "user:" + str(count + 1)
+    r.hset(usr, "user_id", index + 1)
+
+    for key, value in kwargs.items():         
+        r.hset(usr, key, value)
+        
+        
+    r.incr("compteur")
+    return r.hget(usr, "user_id")
 
 def get_user_by_id(user_id):
 
