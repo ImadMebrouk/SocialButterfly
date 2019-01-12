@@ -1,5 +1,3 @@
-#from TestRedis import*
-#from redis_wrap import get_redis, get_hash, get_set, setup_system
 import redis
 
 r = redis.Redis(
@@ -74,6 +72,17 @@ def  delete_friend(user_id, friend_id): #WORKING
     r.srem('user:'+str(user_id)+".friends", friend_id)
     r.srem('user:'+str(friend_id)+".friends",user_id)
     
+def AskFriendship(friend_id): #use this for new friends request 
+    r.sadd( r.sadd('user:'+str(friend_id)+".friendsRequests",user_id))
+
+def AcceptRequest(friends_id):    
+     r.sadd('user:'+str(user_id)+".friends", friend_id)
+     r.srem('user:'+str(friend_id)+".friendsRequests",friends_id)
+
+def DenyRequest(friends_id):    
+     r.srem('user:'+str(friend_id)+".friendsRequests",friends_id)
+
+
 Imad = {
     "username": "coach",
     "password": "password",
@@ -81,9 +90,7 @@ Imad = {
     "last_name": "Mebrouk",
     "age":"23",
     "gender":"male",
-    "location": "Sannois",
-    "friendsList": "",
-    "posts": ""
+    "location": "Sannois"
     }
 
 Clement = {
@@ -93,9 +100,7 @@ Clement = {
     "last_name": "jacques",
     "age":"22",
     "gender":"male",
-    "location": "Sannois",
-    "friendsList": "",
-    "posts": ""
+    "location": "Sannois"
     }
 
 Test = {
