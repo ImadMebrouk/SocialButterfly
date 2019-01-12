@@ -72,16 +72,27 @@ def  delete_friend(user_id, friend_id): #WORKING
     r.srem('user:'+str(user_id)+".friends", friend_id)
     r.srem('user:'+str(friend_id)+".friends",user_id)
     
-def AskFriendship(friend_id): #use this for new friends request 
-    r.sadd( r.sadd('user:'+str(friend_id)+".friendsRequests",user_id))
+def AskFriendship(user_id ,friend_id): #use this for new friends request 
+    r.sadd( r.sadd('user:'+str(friend_id)+".friendsRequestsWaiting",user_id))
+    r.sadd( r.sadd('user:'+str(user_id)+".friendsRequestsSent",friend_id))
 
-def AcceptRequest(friends_id):    
+def AcceptRequest(user_id, friends_id):    
      r.sadd('user:'+str(user_id)+".friends", friend_id)
-     r.srem('user:'+str(friend_id)+".friendsRequests",friends_id)
+     r.srem('user:'+str(friend_id)+".friendsRequestsWaiting",friends_id)
+     r.srem('user:'+str(friends_id)+".friendsRequestsSent",user_id)
 
-def DenyRequest(friends_id):    
-     r.srem('user:'+str(friend_id)+".friendsRequests",friends_id)
+def DenyRequest(user_id, friends_id):    
+     r.srem('user:'+str(user_id)+".friendsRequestsWaiting",friends_id)
+     r.srem('user:'+str(friends_id)+".friendsRequestsSent",user_id)
 
+def UpdateStatus(user_id, newStatut):
+   
+     r.hset("user:"+str(user_id), "statut" ,str(newStatut) )
+     r.rpush('user:'+str(user_id)+".updates", str(newStatut))  #check this list for the latest status
+
+
+def NewPost(user_id, newPost): # ToDO 
+     r.sadd( r.sadd('user:'+str(user_id)+".posts",newPost))
 
 Imad = {
     "username": "coach",
@@ -90,7 +101,8 @@ Imad = {
     "last_name": "Mebrouk",
     "age":"23",
     "gender":"male",
-    "location": "Sannois"
+    "location": "Sannois",
+    "statut": ""
     }
 
 Clement = {
@@ -100,7 +112,8 @@ Clement = {
     "last_name": "jacques",
     "age":"22",
     "gender":"male",
-    "location": "Sannois"
+    "location": "Sannois",
+    "statut": ""
     }
 
 Test = {
@@ -111,8 +124,7 @@ Test = {
     "age":"22",
     "gender":"male",
     "location": "Paris",
-    "friendsList": "",
-    "posts": ""
+    "statut": ""
     }
 
 
