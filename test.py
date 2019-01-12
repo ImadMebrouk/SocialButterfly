@@ -8,7 +8,7 @@ r = redis.Redis(
 
 
 
-def create_user( **kwargs):
+def create_user( **kwargs):   #WORKING
 
     id_count= r.exists("id_count")
 
@@ -28,7 +28,7 @@ def create_user( **kwargs):
     r.incr("compteur")
     return r.hget(user, "user_id")
 
-def user_connection(username, pwd):
+def user_connection(username, pwd): #working
     connection_success = False
     if(get_user_by_username(username)):
         current_password = str(r.hget("user:"+str(get_user_by_username(username)), "password"))
@@ -39,7 +39,7 @@ def user_connection(username, pwd):
 
     return connection_success
 
-def get_user_by_username(username):
+def get_user_by_username(username): #working
     user_id =1
     user = "user:" + str(user_id)
     while r.hget(user,"username") != None:
@@ -50,7 +50,7 @@ def get_user_by_username(username):
             user_id+=1
     return false # no user found with this username 
 
-def get_user_by_id(user_id):
+def get_user_by_id(user_id): #working
 
     username = r.hget("user:" + str(user_id), "username")
 
@@ -61,7 +61,7 @@ def get_user_by_id(user_id):
         return False
 
 
-def add_Friend(user_id, friend_id):
+def add_Friend(user_id, friend_id): #toDO
     
     r.lpush('user.'+user_id+'.friendsList', friend_id)
     r.lpush('user.'+friend_id+'.friendsList', user_id)
